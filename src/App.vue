@@ -74,7 +74,7 @@ export default {
           });
         this.userEmail = user.email
         if (this.$route.name === 'login')
-          this.$router.push({name: 'home'}).catch(err => console.log(err))
+          this.$router.push({name: 'posts'}).catch(err => console.log(err))
       }
       else {
         console.log("User is not logged in")
