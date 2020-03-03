@@ -2,7 +2,7 @@
 
       <div class="card text-center">
         <div class="card-header text-left">
-          By <strong>{{ info.email }}</strong>
+          {{info.title}} by <strong>{{ info.email }}</strong>
         </div>
         <div class="card-body">
           <img class="card-img-top" :src="info.url" alt="Maznusmo s unsplasha i bilo bi lijepo da napisemo cija je slika">

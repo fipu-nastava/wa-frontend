@@ -38,68 +38,67 @@
 </template>
 
 <script type="text/javascript">
-import store from '@/store.js'
+import "bootstrap";
+import "bootstrap/dist/css/bootstrap.min.css";
+import store from "@/store.js";
 
 export default {
-  data () {
+  data() {
     return store;
   },
-
   methods: {
     logout() {
-      firebase.auth().signOut()
+      firebase.auth().signOut();
     }
   },
-
-  mounted () {
+  mounted() {
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
-        console.log("User is logged in with email " + user.email)
-        this.authenticated = true
+        console.log("User is logged in with email " + user.email);
+        this.authenticated = true;
 
-         db.collection("korisnici")
+        db.collection("korisnici")
           .doc(user.email)
           .get()
           .then(doc => {
-              if (doc.exists) {
-                console.log("Document data:", doc.data());
-                this.tipKorisnika = doc.data().tipProfila;
-              } else {
-                // doc.data() will be undefined in this case
-                console.log("No such document!");
-              }
+            if (doc.exists) {
+              console.log("Document data:", doc.data());
+              this.tipKorisnika = doc.data().tipProfila;
+            } else {
+              // doc.data() will be undefined in this case
+              console.log("No such document!");
+            }
           });
-        this.userEmail = user.email
-        if (this.$route.name === 'login')
-          this.$router.push({name: 'posts'}).catch(err => console.log(err))
-      }
-      else {
-        console.log("User is not logged in")
-        this.authenticated = false
-        if (this.$route.name !== 'login')
-          this.$router.push({name: 'login'}).catch(err => console.log(err))
+        this.userEmail = user.email;
+        if (this.$route.name === "login")
+          this.$router.push({ name: "posts" }).catch(err => console.log(err));
+      } else {
+        console.log("User is not logged in");
+        this.authenticated = false;
+        if (this.$route.name !== "login")
+          this.$router.push({ name: "login" }).catch(err => console.log(err));
       }
     });
 
-    this.cards = []
-    db.collection("posts")
-      .orderBy("posted_at", "desc")
-      .limit(10)
-      .get()
-      .then(querySnapshot => {
-        querySnapshot.forEach(doc => {
-          let data = doc.data()
-          const card = {id: doc.id, url: data.url, email: data.email, title: 'Some title', posted_at: data.posted_at, comments: data.comments}
-          this.cards.unshift(card)
-        });
-    });
+    // this.cards = []
+    // db.collection("posts")
+    //   .orderBy("posted_at", "desc")
+    //   .limit(10)
+    //   .get()
+    //   .then(querySnapshot => {
+    //     querySnapshot.forEach(doc => {
+    //       let data = doc.data()
+    //       const card = {id: doc.id, url: data.url, email: data.email, title: 'Some title', posted_at: data.posted_at, comments: data.comments}
+    //       this.cards.unshift(card)
+    //     });
+    // });
   }
-}
+};
 </script>
 
 <style lang="scss">
 body {
-  background-color: rgba(var(--b3f,250,250,250),1)
+  background-color: rgba(var(--b3f, 250, 250, 250), 1);
 }
 
 .bg-white {
