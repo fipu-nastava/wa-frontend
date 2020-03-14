@@ -4,6 +4,5 @@ export default {
     newUrl: '',
     searchTerm: '',
     postComment: '',
-    imageData: null,
     tipKorisnika: null
 }
