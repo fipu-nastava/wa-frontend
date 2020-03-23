@@ -27,17 +27,9 @@ export default {
   },
   name: "posts",
   methods: {
-    fetchPosts(term) {
+    async fetchPosts(term) {
       term = term || store.searchTerm
-
-      Posts.getAll(term)
-        .then(response => {
-          let data = response.data;
-          console.log("Podaci s backenda", data)
-          this.cards = data.map(doc => {
-            return {id: doc.id, url: doc.source, email: doc.createdBy, title: doc.title, posted_at: Number(doc.postedAt)}
-          })
-        })
+      this.cards = await Posts.getAll(term)
     },
     gotoDetails(card) {
       this.$router.push({path: `post/${card.id}`})
