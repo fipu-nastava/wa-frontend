@@ -16,7 +16,7 @@ let Posts = {
 
         if (searchTerm) {
             options.params = {
-                title: searchTerm
+                _any: searchTerm
             }
         }
 
