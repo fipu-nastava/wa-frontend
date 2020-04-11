@@ -11,6 +11,19 @@ let Posts = {
     add(post) {
         return Service.post('/posts', post);
     },
+    async getOne(id) {
+        let response = await Service.get(`/posts/${id}`);
+
+        let doc = response.data;
+
+        return {
+            id: doc._id,
+            url: doc.source,
+            email: doc.createdBy,
+            title: doc.title,
+            posted_at: Number(doc.postedAt)
+        };
+    },
     async getAll(searchTerm) {
         let options = {};
 
@@ -23,7 +36,7 @@ let Posts = {
         let response = await Service.get('/posts', options);
         return response.data.map(doc => {
             return {
-                id: doc.id,
+                id: doc._id,
                 url: doc.source,
                 email: doc.createdBy,
                 title: doc.title,
