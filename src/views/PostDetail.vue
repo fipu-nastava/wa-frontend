@@ -13,7 +13,7 @@ export default {
     props: ['id'],
     data() {
         return {
-            card: null
+            card: null,
         };
     },
     async mounted() {
@@ -22,8 +22,8 @@ export default {
     },
     name: 'post-detail',
     components: {
-        InstagramCard
-    }
+        InstagramCard,
+    },
 };
 </script>
 
