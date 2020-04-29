@@ -1,108 +1,145 @@
 <template>
-
-      <div class="card text-center">
+    <div class="card text-center">
         <div class="card-header text-left">
-          {{info.title}} by <strong>{{ info.email }}</strong>
+            {{ info.title }} by
+            <strong>{{ info.email }}</strong>
         </div>
         <div class="card-body">
-          <img class="card-img-top" :src="info.url" alt="Maznusmo s unsplasha i bilo bi lijepo da napisemo cija je slika">
+            <img
+                class="card-img-top"
+                :src="info.url"
+                alt="Maznusmo s unsplasha i bilo bi lijepo da napisemo cija je slika"
+            />
         </div>
         <div class="card-footer text-left">
-          <div>{{ timeAgo }}</div>
+            <div>{{ timeAgo }}</div>
 
-          <div v-if="showcomments">
-            <div class="comments list-group">
-              <a :key="c.posted_at" v-for="c in comments" href="#" class="animate list-group-item list-group-item-action flex-column align-items-start">
-                <div class="d-flex w-100 justify-content-between">
-                  <small>{{ formatTime(c.posted_at) }} by {{ c.email }} </small>
+            <div v-if="showcomments">
+                <div class="comments list-group">
+                    <a
+                        :key="c.posted_at"
+                        v-for="c in info.comments"
+                        href="#"
+                        class="animate list-group-item list-group-item-action flex-column align-items-start"
+                    >
+                        <div class="d-flex w-100 justify-content-between">
+                            <small>{{ formatTime(c.posted_at) }} by {{ c.email }}</small>
+                            <a @click="removeComment(c.id)" href="#">Delete</a>
+                        </div>
+                        <small>{{ c.comment }}</small>
+                    </a>
                 </div>
-                <small>{{ c.comment }}</small>
-              </a>
+
+                <form @submit.prevent="postComment" class="form-inline mb-5">
+                    <div class="form-group">
+                        <input
+                            v-model="newComment"
+                            type="text"
+                            class="form-control"
+                            id="imageUrl"
+                            placeholder="Any comment?"
+                        />
+                    </div>
+                    <button type="submit" class="btn btn-primary ml-2">Post</button>
+                </form>
             </div>
-
-            <form @submit.prevent="postComment" class="form-inline mb-5">
-              <div class="form-group">
-                <input v-model="newComment" type="text" class="form-control" id="imageUrl" placeholder="Any comment?">
-              </div>
-              <button type="submit" class="btn btn-primary ml-2">Post</button>
-            </form>
-          </div>
-
         </div>
-      </div>
-
+    </div>
 </template>
 
 <script>
-import moment from 'moment'
-import store from '@/store.js'
+import moment from 'moment';
+import store from '@/store.js';
+import { Posts } from '@/services';
 
 export default {
-  props: [ "info", "showcomments" ],
-  data () {
-    return {
-      global: store,
-      newComment: "",
-      comments: []
-    }
-  },
-  mounted() {
-    if (this.showcomments) {
-     db.collection("posts").doc(this.info.id).collection("comments").onSnapshot(snapshot => {
-        snapshot.docChanges().forEach(change => {
-          if (change.type === "added") {
-            let comment = change.doc.data();
-            comment.isNew = true;
-            console.log(comment);
-            this.comments.unshift(comment)
-          }
-        })
-     })
-    }
-  },
-  methods: {
-    formatTime(t) {
-      return moment(t.posted_at).fromNow()
+    props: ['info', 'showcomments'],
+    data() {
+        return {
+            global: store,
+            newComment: '',
+        };
     },
-    postComment() {
-      if (this.newComment) {
-        db.collection("posts")
-          .doc(this.info.id)
-            .collection("comments")
-            .add({ email: this.global.userEmail, comment: this.newComment, posted_at: Date.now() })
-              .then(result => {
-                console.log(result)
-                this.newComment = "";
-              })
-              .catch(e => {
-                console.error(e)
-              })
-      }
-    }
-  },
-  computed: {
-    timeAgo () {
-      return moment(this.info.posted_at).fromNow()
-    }
-  }
-}
+    methods: {
+        async refresh() {
+            let post = await Posts.getOne(this.info.id);
+            this.info.comments = post.comments;
+        },
+        formatTime(t) {
+            return moment(t.posted_at).fromNow();
+        },
+        async removeComment(commentId) {
+            let postId = this.info.id;
+            await Posts.Comments.delete(postId, commentId);
+            this.refresh();
+        },
+        async postComment() {
+            if (this.newComment) {
+                let postId = this.info.id;
+                let comment = {
+                    email: this.global.userEmail,
+                    comment: this.newComment,
+                };
+
+                try {
+                    await Posts.Comments.add(postId, comment);
+                    this.refresh();
+                } catch (e) {
+                    console.error('Greška prilikom snimanja komentara', e);
+                } finally {
+                    this.newComment = '';
+                }
+            }
+        },
+    },
+    computed: {
+        timeAgo() {
+            return moment(this.info.posted_at).fromNow();
+        },
+    },
+};
 </script>
 
 <style>
-  .card {
-    margin-bottom: 10px
-  }
-  .comments {
-    margin: 20px 0
-  }
+.card {
+    margin-bottom: 10px;
+}
+.comments {
+    margin: 20px 0;
+}
 
-  /* ----------------------------------------------
+/* ----------------------------------------------
   * Generated by Animista on 2020-1-3 19:19:35
   * Licensed under FreeBSD License.
   * See http://animista.net/license for more info. 
   * w: http://animista.net, t: @cssanimista
   * ---------------------------------------------- */
-  @-webkit-keyframes fade-in-fwd{0%{-webkit-transform:translateZ(-80px);transform:translateZ(-80px);opacity:0}100%{-webkit-transform:translateZ(0);transform:translateZ(0);opacity:1}}@keyframes fade-in-fwd{0%{-webkit-transform:translateZ(-80px);transform:translateZ(-80px);opacity:0}100%{-webkit-transform:translateZ(0);transform:translateZ(0);opacity:1}}
-  .animate{-webkit-animation:fade-in-fwd 1s cubic-bezier(.39,.575,.565,1.000) both;animation:fade-in-fwd 1s cubic-bezier(.39,.575,.565,1.000) both}
-
+@-webkit-keyframes fade-in-fwd {
+    0% {
+        -webkit-transform: translateZ(-80px);
+        transform: translateZ(-80px);
+        opacity: 0;
+    }
+    100% {
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+        opacity: 1;
+    }
+}
+@keyframes fade-in-fwd {
+    0% {
+        -webkit-transform: translateZ(-80px);
+        transform: translateZ(-80px);
+        opacity: 0;
+    }
+    100% {
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+        opacity: 1;
+    }
+}
+.animate {
+    -webkit-animation: fade-in-fwd 1s cubic-bezier(0.39, 0.575, 0.565, 1) both;
+    animation: fade-in-fwd 1s cubic-bezier(0.39, 0.575, 0.565, 1) both;
+}
 </style>

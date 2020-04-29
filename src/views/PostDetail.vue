@@ -17,7 +17,6 @@ export default {
         };
     },
     async mounted() {
-        console.log(this.id);
         this.card = await Posts.getOne(this.id);
     },
     name: 'post-detail',
